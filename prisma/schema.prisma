@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountStatus {
+  available
+  renting
+  hidden
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  renting
+  completed
+  rejected
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  rejected
+}
+
+enum RentalPackage {
+  hourly
+  night
+  daily
+}
+
+model Account {
+  id                String             @id @default(cuid())
+  name              String
+  slug              String             @unique
+  description       String?
+  heroCount         Int                @default(0) @map("hero_count")
+  skinCount         Int                @default(0) @map("skin_count")
+  sssCount          Int                @default(0) @map("sss_count")
+  collaborationCount Int              @default(0) @map("collaboration_count")
+  rank              String
+  winRate           Float              @default(0) @map("win_rate")
+  reputation        Float              @default(5)
+  vipLevel          String             @map("vip_level")
+  priceHourly       Int                @map("price_hourly")
+  priceNight        Int                @map("price_night")
+  priceDaily        Int                @map("price_daily")
+  status            AccountStatus      @default(available)
+  thumbnailUrl      String             @map("thumbnail_url")
+  gameUsernameEnc   String?            @map("game_username_enc") @db.Text
+  gamePasswordEnc   String?            @map("game_password_enc") @db.Text
+  currentRentEndsAt DateTime?          @map("current_rent_ends_at")
+  isVisible         Boolean            @default(true) @map("is_visible")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  images            AccountImage[]
+  orders            RentOrder[]
+  reviews           Review[]
+  updateLogs        AccountUpdateLog[]
+
+  @@map("accounts")
+}
+
+model AccountImage {
+  id        String   @id @default(cuid())
+  accountId String  @map("account_id")
+  url       String
+  alt       String?
+  sortOrder Int     @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("account_images")
+}
+
+model RentOrder {
+  id             String         @id @default(cuid())
+  accountId      String         @map("account_id")
+  customerName   String         @map("customer_name")
+  phone          String
+  contact        String
+  packageType    RentalPackage  @map("package_type")
+  durationHours  Int            @map("duration_hours")
+  totalPrice     Int            @map("total_price")
+  billImageUrl   String?        @map("bill_image_url")
+  status         OrderStatus    @default(pending)
+  startTime      DateTime?      @map("start_time")
+  endTime        DateTime?      @map("end_time")
+  adminNote      String?        @map("admin_note")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  account        Account        @relation(fields: [accountId], references: [id])
+  reviews        Review[]
+
+  @@map("rent_orders")
+}
+
+model Review {
+  id           String       @id @default(cuid())
+  accountId    String       @map("account_id")
+  orderId      String?      @map("order_id")
+  customerName String       @map("customer_name")
+  rating       Int
+  comment      String
+  status       ReviewStatus @default(pending)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  account      Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  order        RentOrder?   @relation(fields: [orderId], references: [id])
+
+  @@map("reviews")
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+model AccountUpdateLog {
+  id        String   @id @default(cuid())
+  accountId String  @map("account_id")
+  adminId   String? @map("admin_id")
+  action    String
+  changes   Json
+  createdAt DateTime @default(now()) @map("created_at")
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("account_update_logs")
+}
