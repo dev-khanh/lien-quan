@@ -1,14 +1,14 @@
+import { redirect } from "next/navigation";
 import { getAdminFromCookies } from "@/lib/auth";
 import { money } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
-import { AdminLoginForm } from "@/components/AdminLoginForm";
 import { AdminNav } from "@/components/AdminNav";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   const admin = getAdminFromCookies();
-  if (!admin) return <AdminLoginForm />;
+  if (!admin) redirect("/pt-admin/login");
   const now = new Date();
   const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);

@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function AdminReviewsPage() {
-  if (!getAdminFromCookies()) redirect("/admin");
+  if (!getAdminFromCookies()) redirect("/pt-admin/login");
   const reviews = await prisma.review.findMany({ include: { account: true }, orderBy: { createdAt: "desc" } });
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">

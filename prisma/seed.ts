@@ -19,7 +19,8 @@ const samples = [
     priceHourly: 15000,
     priceNight: 79000,
     priceDaily: 149000,
-    thumbnailUrl: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=80"
+    thumbnailUrl: "/account-samples/acc-sea.jpg",
+    status: "renting" as const
   },
   {
     name: "ACC ACE",
@@ -32,10 +33,11 @@ const samples = [
     winRate: 64.2,
     reputation: 4.8,
     vipLevel: "VIP 6",
-    priceHourly: 12000,
-    priceNight: 69000,
-    priceDaily: 129000,
-    thumbnailUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80"
+    priceHourly: 25000,
+    priceNight: 130000,
+    priceDaily: 300000,
+    thumbnailUrl: "/account-samples/acc-ace.jpg",
+    status: "renting" as const
   },
   {
     name: "ACC COBE",
@@ -48,10 +50,11 @@ const samples = [
     winRate: 61.7,
     reputation: 4.7,
     vipLevel: "VIP 5",
-    priceHourly: 10000,
-    priceNight: 59000,
-    priceDaily: 109000,
-    thumbnailUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=900&q=80"
+    priceHourly: 25000,
+    priceNight: 125000,
+    priceDaily: 250000,
+    thumbnailUrl: "/account-samples/acc-cobe.jpg",
+    status: "renting" as const
   },
   {
     name: "ACC TÍM",
@@ -64,10 +67,28 @@ const samples = [
     winRate: 72.3,
     reputation: 5,
     vipLevel: "VIP 8",
-    priceHourly: 20000,
-    priceNight: 99000,
-    priceDaily: 189000,
-    thumbnailUrl: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=900&q=80"
+    priceHourly: 45000,
+    priceNight: 230000,
+    priceDaily: 500000,
+    thumbnailUrl: "/account-samples/acc-tim.jpg",
+    status: "available" as const
+  },
+  {
+    name: "ACC NÂU",
+    slug: "acc-nau",
+    heroCount: 128,
+    skinCount: 1030,
+    sssCount: 17,
+    collaborationCount: 13,
+    rank: "Thách đấu",
+    winRate: 59.6,
+    reputation: 5,
+    vipLevel: "VIP 10",
+    priceHourly: 35000,
+    priceNight: 175000,
+    priceDaily: 350000,
+    thumbnailUrl: "/account-samples/acc-nau.jpg",
+    status: "renting" as const
   }
 ];
 
@@ -79,19 +100,32 @@ async function main() {
   });
 
   for (const acc of samples) {
+    const currentRentEndsAt = acc.status === "renting" ? new Date(Date.now() + (90 + Math.floor(Math.random() * 540)) * 60 * 1000) : null;
     await prisma.account.upsert({
       where: { slug: acc.slug },
-      update: acc,
+      update: {
+        ...acc,
+        currentRentEndsAt,
+        images: {
+          deleteMany: {},
+          create: [
+            { url: acc.thumbnailUrl, alt: `${acc.name} preview`, sortOrder: 0 },
+            { url: "/account-samples/acc-sea.jpg", alt: "Kho skin Liên Quân", sortOrder: 1 },
+            { url: "/account-samples/acc-ace.jpg", alt: "Kho skin SSS", sortOrder: 2 }
+          ]
+        }
+      },
       create: {
         ...acc,
+        currentRentEndsAt,
         description: "Acc Liên Quân nhiều skin đẹp, thuê nhanh sau khi admin xác nhận thanh toán.",
         gameUsernameEnc: encryptSecret(`${acc.slug}_login`),
         gamePasswordEnc: encryptSecret("secret-demo"),
         images: {
           create: [
-            { url: acc.thumbnailUrl, alt: `${acc.name} avatar`, sortOrder: 0 },
-            { url: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?auto=format&fit=crop&w=900&q=80", alt: "Kho skin", sortOrder: 1 },
-            { url: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=900&q=80", alt: "Rank", sortOrder: 2 }
+            { url: acc.thumbnailUrl, alt: `${acc.name} preview`, sortOrder: 0 },
+            { url: "/account-samples/acc-sea.jpg", alt: "Kho skin Liên Quân", sortOrder: 1 },
+            { url: "/account-samples/acc-ace.jpg", alt: "Kho skin SSS", sortOrder: 2 }
           ]
         }
       }

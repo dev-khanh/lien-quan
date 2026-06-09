@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function AdminAccountsPage() {
-  if (!getAdminFromCookies()) redirect("/admin");
+  if (!getAdminFromCookies()) redirect("/pt-admin/login");
   const accounts = await prisma.account.findMany({ orderBy: { createdAt: "desc" } });
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">

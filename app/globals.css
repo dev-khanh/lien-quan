@@ -9,9 +9,7 @@
 body {
   min-height: 100vh;
   color: #2f1935;
-  background:
-    radial-gradient(circle at top left, rgba(255, 218, 89, 0.26), transparent 28rem),
-    linear-gradient(135deg, #ff4fb8 0%, #8b2fe8 55%, #4b1fb5 100%);
+  background: linear-gradient(180deg, #fff7fb 0%, #ffeef7 58%, #fff9fd 100%);
 }
 
 button,
