@@ -11,16 +11,19 @@ export const accountSchema = z.object({
   rank: z.string().min(1),
   winRate: z.coerce.number().min(0).max(100),
   reputation: z.coerce.number().min(0).max(5),
+  battleCount: z.coerce.number().int().min(0).optional(),
   vipLevel: z.string().min(1),
   priceHourly: z.coerce.number().int().min(1000),
   priceNight: z.coerce.number().int().min(1000),
   priceDaily: z.coerce.number().int().min(1000),
   thumbnailUrl: z.string().min(1),
-  status: z.enum(["available", "renting", "hidden"]).optional(),
+  status: z.enum(["available", "renting", "maintenance", "hidden"]).optional(),
   isVisible: z.coerce.boolean().optional(),
   images: z.array(z.string().url().or(z.string().startsWith("/"))).optional(),
   gameUsername: z.string().optional().nullable(),
-  gamePassword: z.string().optional().nullable()
+  gamePassword: z.string().optional().nullable(),
+  loginNote: z.string().optional().nullable(),
+  adminNote: z.string().optional().nullable()
 });
 
 export const rentOrderSchema = z.object({

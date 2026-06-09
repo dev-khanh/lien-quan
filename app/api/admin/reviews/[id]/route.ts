@@ -10,3 +10,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   const review = await prisma.review.update({ where: { id: params.id }, data: { status } });
   return NextResponse.json(review);
 }
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const { error } = await requireAdmin(request);
+  if (error) return error;
+  await prisma.review.delete({ where: { id: params.id } });
+  return NextResponse.json({ ok: true });
+}

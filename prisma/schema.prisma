@@ -10,6 +10,7 @@ datasource db {
 enum AccountStatus {
   available
   renting
+  maintenance
   hidden
 }
 
@@ -18,6 +19,8 @@ enum OrderStatus {
   confirmed
   renting
   completed
+  cancelled
+  expired
   rejected
 }
 
@@ -45,6 +48,7 @@ model Account {
   rank              String
   winRate           Float              @default(0) @map("win_rate")
   reputation        Float              @default(5)
+  battleCount       Int                @default(0) @map("battle_count")
   vipLevel          String             @map("vip_level")
   priceHourly       Int                @map("price_hourly")
   priceNight        Int                @map("price_night")
@@ -53,6 +57,8 @@ model Account {
   thumbnailUrl      String             @map("thumbnail_url")
   gameUsernameEnc   String?            @map("game_username_enc") @db.Text
   gamePasswordEnc   String?            @map("game_password_enc") @db.Text
+  loginNote         String?            @map("login_note") @db.Text
+  adminNote         String?            @map("admin_note") @db.Text
   currentRentEndsAt DateTime?          @map("current_rent_ends_at")
   isVisible         Boolean            @default(true) @map("is_visible")
   createdAt         DateTime           @default(now()) @map("created_at")
@@ -120,6 +126,7 @@ model Admin {
   email        String   @unique
   passwordHash String   @map("password_hash")
   name         String
+  role         String   @default("admin")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -132,6 +139,10 @@ model AccountUpdateLog {
   adminId   String? @map("admin_id")
   action    String
   changes   Json
+  fieldName String?  @map("field_name")
+  oldValue  String?  @map("old_value") @db.Text
+  newValue  String?  @map("new_value") @db.Text
+  note      String?
   createdAt DateTime @default(now()) @map("created_at")
   account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 

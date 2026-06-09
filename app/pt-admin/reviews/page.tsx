@@ -12,19 +12,25 @@ export default async function AdminReviewsPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
       <AdminNav />
-      <section className="rounded-lg bg-white p-4 shadow-game">
-        <h1 className="mb-4 text-2xl font-black text-purple-950">Duyệt đánh giá</h1>
-        <div className="space-y-3">
-          {reviews.map((review) => (
-            <div key={review.id} className="rounded-lg border p-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <strong className="mr-auto">{review.customerName} · {review.account.name} · {review.rating} sao</strong>
-                <span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-black text-purple-700">{review.status}</span>
-                {review.status === "pending" && <ReviewModeration id={review.id} />}
-              </div>
-              <p className="mt-2 text-sm text-slate-700">{review.comment}</p>
-            </div>
-          ))}
+      <section className="rounded-lg border border-[#f3d6e6] bg-white p-4 shadow-[0_10px_24px_rgba(236,63,150,0.08)]">
+        <h1 className="mb-4 text-2xl font-black text-[#111827]">Duyệt đánh giá</h1>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[900px] text-left text-sm">
+            <thead><tr className="border-b bg-[#fff7fb] text-xs uppercase text-slate-500"><th className="p-2">Tên khách</th><th>ACC</th><th>Sao</th><th>Bình luận</th><th>Trạng thái</th><th>Ngày gửi</th><th>Hành động</th></tr></thead>
+            <tbody>
+              {reviews.map((review) => (
+                <tr key={review.id} className="border-b align-top">
+                  <td className="p-2 font-bold">{review.customerName}</td>
+                  <td>{review.account.name}</td>
+                  <td>{review.rating}</td>
+                  <td className="max-w-md">{review.comment}</td>
+                  <td><span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-black text-purple-700">{review.status}</span></td>
+                  <td>{review.createdAt.toLocaleString("vi-VN")}</td>
+                  <td><ReviewModeration id={review.id} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
     </main>

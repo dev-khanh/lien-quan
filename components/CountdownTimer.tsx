@@ -24,7 +24,7 @@ export function CountdownTimer({ endAt, variant = "pill" }: { endAt: string | Da
 
   if (variant === "bar") {
     return (
-      <div className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#eef7ff] px-3 text-center text-[12px] font-black uppercase text-[#e53935] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] sm:text-sm">
+      <div className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#eef7ff] px-3 text-center text-[12px] font-black uppercase tracking-wide text-[#e53935] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] sm:text-sm">
         <Clock3 className="h-4 w-4" />
         <span>{text}</span>
       </div>

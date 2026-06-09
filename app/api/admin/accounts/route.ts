@@ -18,12 +18,14 @@ export async function POST(request: NextRequest) {
   if (error) return error;
   try {
     const parsed = accountSchema.parse(await request.json());
+    const { gameUsername, gamePassword, images, ...accountData } = parsed;
     const account = await prisma.account.create({
       data: {
-        ...parsed,
-        gameUsernameEnc: encryptSecret(parsed.gameUsername),
-        gamePasswordEnc: encryptSecret(parsed.gamePassword),
-        images: { create: parsed.images?.map((url, sortOrder) => ({ url, sortOrder })) || [] }
+        ...accountData,
+        isVisible: accountData.status !== "hidden",
+        gameUsernameEnc: encryptSecret(gameUsername),
+        gamePasswordEnc: encryptSecret(gamePassword),
+        images: { create: images?.map((url, sortOrder) => ({ url, sortOrder })) || [] }
       }
     });
     await prisma.accountUpdateLog.create({ data: { accountId: account.id, adminId: admin.id, action: "create", changes: parsed } });

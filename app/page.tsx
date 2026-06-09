@@ -1,4 +1,5 @@
-import { AccountCard } from "@/components/AccountCard";
+import { PublicAccountBrowser } from "@/components/PublicAccountBrowser";
+import { Crown } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -10,32 +11,42 @@ export default async function HomePage() {
     orderBy: [{ status: "asc" }, { createdAt: "desc" }]
   });
   const reviews = accounts.flatMap((account) => account.reviews.map((review) => ({ ...review, accountName: account.name }))).slice(0, 6);
+  const publicAccounts = accounts.map((account) => ({
+    id: account.id,
+    slug: account.slug,
+    name: account.name,
+    thumbnailUrl: account.thumbnailUrl,
+    sssCount: account.sssCount,
+    collaborationCount: account.collaborationCount,
+    vipLevel: account.vipLevel,
+    priceHourly: account.priceHourly,
+    priceNight: account.priceNight,
+    priceDaily: account.priceDaily,
+    status: account.status,
+    currentRentEndsAt: account.currentRentEndsAt?.toISOString() || null
+  }));
   return (
-    <main className="mx-auto max-w-6xl px-3 py-5 text-[#111827] sm:px-5 lg:py-8">
-      <header className="mb-5 rounded-[24px] border border-[#f3d6e6] bg-white/78 px-4 py-5 shadow-[0_12px_32px_rgba(236,63,150,0.10)] backdrop-blur sm:px-6">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#ec3f96]">Shop thuê ACC Liên Quân</p>
-          <h1 className="mt-1 text-2xl font-black tracking-tight sm:text-3xl">Acc nhiều skin, thuê nhanh, giá rẻ</h1>
-          <p className="mt-2 max-w-2xl text-sm font-medium text-slate-600">Danh sách acc được cập nhật liên tục, thông tin thuê chỉ mở sau khi admin xác nhận thanh toán.</p>
+    <main className="mx-auto max-w-[1360px] px-4 py-5 text-[#111827] sm:px-6 lg:py-8">
+      <header className="relative mb-5 overflow-hidden rounded-[24px] border border-[#fbd0e3] bg-white/[0.92] px-5 py-6 shadow-[0_18px_54px_rgba(236,63,150,0.18)] backdrop-blur-md sm:px-8 lg:px-12">
+        <div className="pointer-events-none absolute right-10 top-7 text-4xl font-black text-[#ffd6e8]">✦</div>
+        <div className="pointer-events-none absolute right-28 bottom-8 text-2xl font-black text-[#ffe3ef]">✦</div>
+        <div className="flex items-center gap-5">
+          <div className="hidden h-20 w-20 shrink-0 items-center justify-center rounded-[22px] border border-[#ffb8d8] bg-gradient-to-b from-[#ffe6f1] to-[#ff7eb8] text-white shadow-[0_14px_30px_rgba(236,63,150,0.28)] sm:flex">
+            <Crown className="h-10 w-10 fill-current" />
+          </div>
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.34em] text-[#ec3f96]">Shop thuê ACC Liên Quân</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-[#111827] sm:text-4xl">
+              Acc nhiều skin, <span className="text-[#ec3f96]">thuê nhanh, giá rẻ</span>
+            </h1>
+            <p className="mt-3 max-w-3xl text-sm font-semibold text-slate-600 sm:text-base">Danh sách acc được cập nhật liên tục, thông tin thuê chỉ mở sau khi admin xác nhận thanh toán.</p>
+          </div>
         </div>
       </header>
 
-      <section className="mb-5 flex flex-wrap gap-2 rounded-[20px] border border-[#f3d6e6] bg-white/70 p-3 shadow-[0_8px_22px_rgba(236,63,150,0.08)]">
-        {["Tất cả", "Sẵn sàng", "Đang thuê", "Nhiều SSS", "VIP cao"].map((item, index) => (
-          <button
-            key={item}
-            className={`rounded-full border px-4 py-2 text-sm font-black ${index === 0 ? "border-[#ec3f96] bg-[#ec3f96] text-white" : "border-[#f3d6e6] bg-white text-[#ec3f96]"}`}
-          >
-            {item}
-          </button>
-        ))}
-      </section>
+      <PublicAccountBrowser accounts={publicAccounts} />
 
-      <section className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-        {accounts.map((account, index) => <AccountCard key={account.id} account={account} priority={index < 3} />)}
-      </section>
-
-      <section className="mt-8 rounded-[24px] border border-[#f3d6e6] bg-white/80 p-5 shadow-[0_12px_32px_rgba(236,63,150,0.10)]">
+      <section className="mt-8 rounded-[24px] border border-[#fbd0e3] bg-white/[0.90] p-5 text-[#111827] shadow-[0_16px_40px_rgba(236,63,150,0.16)] backdrop-blur-md">
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#ec3f96]">Đánh giá khách hàng</p>
@@ -43,11 +54,7 @@ export default async function HomePage() {
           </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {(reviews.length ? reviews : [
-            { id: "demo-1", customerName: "Minh Anh", accountName: "ACC SEA", rating: 5, comment: "Xác nhận nhanh, acc đúng ảnh và nhiều skin đẹp." },
-            { id: "demo-2", customerName: "Gia Huy", accountName: "ACC TÍM", rating: 5, comment: "Giá ổn, thuê qua đêm rất mượt." },
-            { id: "demo-3", customerName: "Hoàng", accountName: "ACC ACE", rating: 5, comment: "Shop hỗ trợ nhanh, countdown rõ ràng." }
-          ]).map((review) => (
+          {reviews.map((review) => (
             <article key={review.id} className="rounded-[18px] border border-[#f3d6e6] bg-white p-4">
               <div className="flex items-center justify-between gap-3">
                 <strong>{review.customerName}</strong>
@@ -56,10 +63,11 @@ export default async function HomePage() {
               <p className="mt-2 text-sm font-medium text-slate-600">{review.comment}</p>
             </article>
           ))}
+          {!reviews.length && <p className="text-sm font-bold text-slate-600">Chưa có đánh giá được duyệt.</p>}
         </div>
       </section>
 
-      <footer className="mt-8 rounded-[24px] border border-[#f3d6e6] bg-white/70 p-5 text-center text-sm font-semibold text-slate-600">
+      <footer className="mt-8 rounded-[24px] border border-[#fbd0e3] bg-white/[0.88] p-5 text-center text-sm font-semibold text-slate-600 shadow-[0_12px_30px_rgba(236,63,150,0.12)] backdrop-blur-md">
         <p className="font-black text-[#111827]">Shop thuê ACC Liên Quân</p>
         <p className="mt-1">Liên hệ Zalo/Facebook: cập nhật trong cấu hình shop. Hỗ trợ thuê acc theo giờ, đêm, ngày.</p>
       </footer>

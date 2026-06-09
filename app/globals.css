@@ -9,7 +9,7 @@
 body {
   min-height: 100vh;
   color: #2f1935;
-  background: linear-gradient(180deg, #fff7fb 0%, #ffeef7 58%, #fff9fd 100%);
+  background: #13061f;
 }
 
 button,
@@ -17,4 +17,87 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+.public-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: #13061f;
+}
+
+.public-bg__image {
+  position: absolute;
+  inset: -3%;
+  background-image: url("/backgrounds/lien-quan-hero-bg.png");
+  background-size: cover;
+  background-position: center top;
+  filter: saturate(1.08) contrast(1.04);
+  transform: scale(1.04);
+  animation: public-bg-drift 18s ease-in-out infinite alternate;
+  will-change: transform, filter;
+}
+
+.public-bg__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 47, 159, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(15, 5, 27, 0.08) 0%, rgba(15, 5, 27, 0.18) 42%, rgba(15, 5, 27, 0.36) 100%);
+  backdrop-filter: blur(0.3px);
+}
+
+.public-bg__sparks {
+  position: absolute;
+  inset: -20%;
+  opacity: 0.38;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.6px),
+    radial-gradient(circle, rgba(255, 89, 182, 0.85) 0 1.2px, transparent 2px),
+    radial-gradient(circle, rgba(255, 197, 89, 0.85) 0 1px, transparent 1.8px);
+  background-size: 150px 150px, 210px 210px, 260px 260px;
+  animation: public-sparks-float 22s linear infinite;
+  will-change: transform;
+}
+
+.public-bg__sparks--two {
+  opacity: 0.24;
+  transform: rotate(18deg);
+  animation-duration: 32s;
+  animation-direction: reverse;
+}
+
+@keyframes public-bg-drift {
+  from {
+    transform: scale(1.04) translate3d(-1.2%, -0.8%, 0);
+    filter: saturate(1.05) contrast(1.02) brightness(0.98);
+  }
+  to {
+    transform: scale(1.09) translate3d(1.2%, 1%, 0);
+    filter: saturate(1.16) contrast(1.08) brightness(1.05);
+  }
+}
+
+@keyframes public-sparks-float {
+  from {
+    transform: translate3d(-2%, 0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(2%, -6%, 0) rotate(8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-bg__image,
+  .public-bg__sparks {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .public-bg__image {
+    inset: -10%;
+    background-position: center top;
+  }
 }

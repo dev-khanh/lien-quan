@@ -17,14 +17,14 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
   });
   if (!account) notFound();
   const stats: Array<[string, string | number, LucideIcon]> = [
-    ["Tướng", account.heroCount, CheckCircle2],
-    ["Skin", account.skinCount, Sparkles],
-    ["Hợp tác", account.collaborationCount, Crown],
+    ["Tổng Skin", account.skinCount, Sparkles],
+    ["Skin SSS", account.sssCount, Star],
+    ["Skin hợp tác", account.collaborationCount, Crown],
     ["Rank", account.rank, ShieldCheck],
-    ["Tỷ lệ thắng", `${account.winRate}%`, Percent],
-    ["Uy tín", `${account.reputation}/5`, Star],
+    ["Uy tín hiện tại", `${account.reputation}/5`, Star],
     ["VIP", account.vipLevel, ShieldCheck],
-    ["SSS", account.sssCount, Sparkles]
+    ["Tỷ lệ thắng", `${account.winRate}%`, Percent],
+    ["Tướng", account.heroCount, CheckCircle2]
   ];
   return (
     <main className="mx-auto max-w-7xl px-3 py-5 sm:px-5">
@@ -40,7 +40,7 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="mr-auto text-2xl font-black text-[#111827]">{account.name}</h1>
                 <span className="rounded-full bg-pink-100 px-3 py-1 text-sm font-black text-pink-600">SSS {account.sssCount}</span>
-                <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-black text-white">{account.status === "renting" ? "Đang thuê" : "Sẵn sàng"}</span>
+                <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-black text-white">{account.status === "renting" ? "Đang thuê" : account.status === "maintenance" ? "Bảo trì" : "Sẵn sàng"}</span>
               </div>
               <p className="mt-3 text-sm text-slate-700">{account.description}</p>
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -72,7 +72,11 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
               <p className="rounded-full bg-amber-100 px-3 py-2 font-black text-orange-700">{money(account.priceDaily)} / ngày</p>
             </div>
           </div>
-          <RentForm accountId={account.id} />
+          <RentForm
+            accountId={account.id}
+            disabled={account.status !== "available"}
+            disabledMessage={account.status === "renting" ? "ACC này đang được thuê, vui lòng chọn ACC khác." : "ACC này đang bảo trì, vui lòng chọn ACC khác."}
+          />
           <ReviewForm accountId={account.id} />
         </aside>
       </div>

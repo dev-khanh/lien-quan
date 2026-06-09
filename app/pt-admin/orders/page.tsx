@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { ConfirmOrderButton } from "@/components/AdminActions";
+import { OrderActions } from "@/components/AdminActions";
 import { AdminNav } from "@/components/AdminNav";
 import { getAdminFromCookies } from "@/lib/auth";
 import { money } from "@/lib/format";
@@ -13,20 +13,31 @@ export default async function AdminOrdersPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
       <AdminNav />
-      <section className="rounded-lg bg-white p-4 shadow-game">
-        <h1 className="mb-4 text-2xl font-black text-purple-950">Đơn thuê</h1>
-        <div className="space-y-3">
-          {orders.map((order) => (
-            <div key={order.id} className="rounded-lg border p-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <strong className="mr-auto">{order.customerName} thuê {order.account.name}</strong>
-                <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-black text-orange-700">{money(order.totalPrice)}</span>
-                <span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-black text-purple-700">{order.status}</span>
-                {order.status === "pending" && <ConfirmOrderButton id={order.id} />}
-              </div>
-              <p className="mt-2 text-sm text-slate-600">{order.phone} · {order.contact} · {order.packageType}</p>
-            </div>
-          ))}
+      <section className="rounded-lg border border-[#f3d6e6] bg-white p-4 shadow-[0_10px_24px_rgba(236,63,150,0.08)]">
+        <h1 className="mb-4 text-2xl font-black text-[#111827]">Đơn thuê</h1>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[1100px] text-left text-sm">
+            <thead><tr className="border-b bg-[#fff7fb] text-xs uppercase text-slate-500"><th className="p-2">Mã đơn</th><th>Khách hàng</th><th>SĐT</th><th>Zalo/Facebook</th><th>ACC</th><th>Gói</th><th>Giá</th><th>Bill</th><th>Trạng thái</th><th>Ngày tạo</th><th>Start</th><th>End</th><th>Hành động</th></tr></thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id} className="border-b align-middle">
+                  <td className="p-2 font-mono text-xs">{order.id.slice(0, 8)}</td>
+                  <td className="font-bold">{order.customerName}</td>
+                  <td>{order.phone}</td>
+                  <td>{order.contact}</td>
+                  <td className="font-bold">{order.account.name}</td>
+                  <td>{order.packageType}</td>
+                  <td>{money(order.totalPrice)}</td>
+                  <td>{order.billImageUrl ? <a className="font-bold text-[#ec3f96]" href={order.billImageUrl} target="_blank">Xem bill</a> : "-"}</td>
+                  <td><span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-black text-purple-700">{order.status}</span></td>
+                  <td>{order.createdAt.toLocaleString("vi-VN")}</td>
+                  <td>{order.startTime?.toLocaleString("vi-VN") || "-"}</td>
+                  <td>{order.endTime?.toLocaleString("vi-VN") || "-"}</td>
+                  <td><OrderActions id={order.id} status={order.status} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
     </main>

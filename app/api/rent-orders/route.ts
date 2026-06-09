@@ -16,7 +16,8 @@ export async function POST(request: NextRequest) {
     });
     const account = await prisma.account.findUnique({ where: { id: parsed.accountId } });
     if (!account || !account.isVisible || account.status !== "available") {
-      return NextResponse.json({ error: "Acc không sẵn sàng để thuê." }, { status: 409 });
+      const error = account?.status === "renting" ? "ACC này đang được thuê, vui lòng chọn ACC khác." : "ACC không sẵn sàng để thuê.";
+      return NextResponse.json({ error }, { status: 409 });
     }
     const bill = form.get("bill");
     const billImageUrl = bill instanceof File && bill.size > 0 ? await saveUpload(bill, "uploads/bills") : null;
