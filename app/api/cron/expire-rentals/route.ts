@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { expireRentals } from "@/scripts/expire-rentals-core";
+import { expireRentals } from "@/lib/expire-rentals";
 
 async function handle(request: NextRequest) {
   const secret = request.headers.get("x-cron-secret") || request.nextUrl.searchParams.get("secret");

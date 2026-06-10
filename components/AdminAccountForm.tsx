@@ -23,6 +23,9 @@ type AccountFormValue = {
   priceDaily: number;
   status: "available" | "renting" | "maintenance" | "hidden";
   thumbnailUrl: string;
+  isFeatured?: boolean;
+  featuredImageUrl?: string | null;
+  featuredOrder?: number | null;
   images: Array<{ id?: string; url: string }>;
   gameUsername?: string | null;
   gamePassword?: string | null;
@@ -48,6 +51,9 @@ const emptyAccount: AccountFormValue = {
   priceDaily: 0,
   status: "available",
   thumbnailUrl: "",
+  isFeatured: false,
+  featuredImageUrl: "",
+  featuredOrder: null,
   images: [],
   gameUsername: "",
   gamePassword: "",
@@ -72,6 +78,8 @@ export function AdminAccountForm({ account }: { account?: AccountFormValue }) {
   const initial = account || emptyAccount;
   const [thumbnailUrl, setThumbnailUrl] = useState(initial.thumbnailUrl);
   const [thumbnailPreview, setThumbnailPreview] = useState(initial.thumbnailUrl);
+  const [featuredImageUrl, setFeaturedImageUrl] = useState(initial.featuredImageUrl || "");
+  const [featuredImagePreview, setFeaturedImagePreview] = useState(initial.featuredImageUrl || "");
   const [detailImages, setDetailImages] = useState(initial.images.map((image) => image.url));
   const [detailPreviews, setDetailPreviews] = useState(initial.images.map((image) => image.url));
   const [message, setMessage] = useState("");
@@ -105,6 +113,18 @@ export function AdminAccountForm({ account }: { account?: AccountFormValue }) {
     }
   }
 
+  async function chooseFeaturedImage(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+    setMessage("");
+    try {
+      setFeaturedImagePreview(URL.createObjectURL(file));
+      setFeaturedImageUrl(await uploadFile(file));
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Upload thất bại.");
+    }
+  }
+
   function removeDetail(index: number) {
     setDetailImages((current) => current.filter((_, itemIndex) => itemIndex !== index));
     setDetailPreviews((current) => current.filter((_, itemIndex) => itemIndex !== index));
@@ -131,6 +151,9 @@ export function AdminAccountForm({ account }: { account?: AccountFormValue }) {
       priceNight: fieldValue(formData, "priceNight"),
       priceDaily: fieldValue(formData, "priceDaily"),
       thumbnailUrl,
+      isFeatured: formData.get("isFeatured") === "on",
+      featuredImageUrl: featuredImageUrl || null,
+      featuredOrder: fieldValue(formData, "featuredOrder") || null,
       images: detailImages,
       gameUsername: fieldValue(formData, "gameUsername"),
       gamePassword: fieldValue(formData, "gamePassword"),
@@ -202,6 +225,27 @@ export function AdminAccountForm({ account }: { account?: AccountFormValue }) {
             <div className="mt-3 w-56 overflow-hidden rounded-lg border border-[#f3d6e6] bg-white">
               <Image src={thumbnailPreview} alt="Preview thumbnail" width={320} height={220} unoptimized className="h-36 w-full object-cover" />
               <button type="button" onClick={() => { setThumbnailUrl(""); setThumbnailPreview(""); }} className="w-full bg-red-600 px-3 py-2 text-sm font-black text-white">Xóa ảnh</button>
+            </div>
+          )}
+        </div>
+        <div className="rounded-lg border border-[#f3d6e6] bg-[#fff7fb] p-4">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <label className="inline-flex items-center gap-2 text-sm font-black text-slate-700">
+              <input name="isFeatured" type="checkbox" defaultChecked={Boolean(initial.isFeatured)} className="h-4 w-4 rounded border-[#f3d6e6] accent-[#ec3f96]" />
+              Hiển thị ở slider nổi bật
+            </label>
+            <label className="text-sm font-bold text-slate-700">
+              Thứ tự slider
+              <input name="featuredOrder" type="number" min="0" defaultValue={initial.featuredOrder ?? ""} placeholder="0" className="ml-2 w-24 rounded-md border border-[#f3d6e6] px-3 py-2 outline-none focus:border-[#ec3f96]" />
+            </label>
+          </div>
+          <p className="mb-1 text-sm font-black text-slate-700">Upload ảnh slider riêng từ desktop</p>
+          <p className="mb-2 text-xs font-semibold text-slate-500">Nên dùng splash art/skin đẹp, không dùng ảnh chụp bảng skin. Gợi ý kích thước 1600x700 hoặc 1400x600.</p>
+          <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => chooseFeaturedImage(event.target.files)} className="block w-full text-sm" />
+          {featuredImagePreview && (
+            <div className="mt-3 w-full max-w-lg overflow-hidden rounded-lg border border-[#f3d6e6] bg-white">
+              <Image src={featuredImagePreview} alt="Preview ảnh slider nổi bật" width={640} height={320} unoptimized className="h-40 w-full object-cover" />
+              <button type="button" onClick={() => { setFeaturedImageUrl(""); setFeaturedImagePreview(""); }} className="w-full bg-red-600 px-3 py-2 text-sm font-black text-white">Xóa ảnh slider</button>
             </div>
           )}
         </div>

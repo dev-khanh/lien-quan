@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Eye, EyeOff, Pencil, Search, Trash2, Wrench } from "lucide-react";
+import { Eye, EyeOff, Pencil, Search, Trash2, X, Wrench } from "lucide-react";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { money } from "@/lib/format";
 
@@ -49,6 +49,8 @@ export function AdminAccountsTable({ accounts }: { accounts: AdminAccount[] }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [sort, setSort] = useState<SortKey>("newest");
+  const [rentingAccount, setRentingAccount] = useState<AdminAccount | null>(null);
+  const [manualMessage, setManualMessage] = useState("");
 
   const rows = useMemo(() => {
     let result = accounts;
@@ -72,10 +74,28 @@ export function AdminAccountsTable({ accounts }: { accounts: AdminAccount[] }) {
     else alert((await res.json().catch(() => null))?.error || "Không cập nhật được ACC.");
   }
 
-  async function setRenting(id: string) {
-    const endTime = window.prompt("Nhập thời gian kết thúc dạng YYYY-MM-DDTHH:mm", "");
-    if (!endTime) return;
-    await patch(id, "set-renting", { endTime, packageType: "hourly", customerName: "Admin set", phone: "N/A", contact: "Admin" });
+  async function submitManualRent(formData: FormData) {
+    if (!rentingAccount) return;
+    setManualMessage("");
+    const body = {
+      customerName: String(formData.get("customerName") || "").trim() || "Khách Zalo",
+      phone: String(formData.get("phone") || "").trim() || "N/A",
+      contact: String(formData.get("contact") || "").trim() || "Zalo",
+      packageType: String(formData.get("packageType") || "hourly"),
+      endTime: String(formData.get("endTime") || ""),
+      adminNote: String(formData.get("adminNote") || "").trim() || null
+    };
+    if (!body.endTime) {
+      setManualMessage("Vui lòng nhập thời gian kết thúc.");
+      return;
+    }
+    const res = await fetch(`/api/admin/accounts/${rentingAccount.id}/set-renting`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) window.location.reload();
+    else setManualMessage((await res.json().catch(() => null))?.error || "Không set được trạng thái thuê.");
   }
 
   async function remove(id: string) {
@@ -139,7 +159,7 @@ export function AdminAccountsTable({ accounts }: { accounts: AdminAccount[] }) {
                   <div className="flex flex-wrap gap-1">
                     <Link href={`/accounts/${account.slug}`} className="rounded-md border border-[#f3d6e6] p-2 text-[#ec3f96]" title="Xem"><Eye className="h-4 w-4" /></Link>
                     <Link href={`/pt-admin/accounts/${account.id}/edit`} className="rounded-md border border-[#f3d6e6] p-2 text-[#ec3f96]" title="Sửa"><Pencil className="h-4 w-4" /></Link>
-                    <button onClick={() => setRenting(account.id)} className="rounded-md bg-red-600 px-2 py-1 text-xs font-black text-white">Set đang thuê</button>
+                    <button onClick={() => { setRentingAccount(account); setManualMessage(""); }} className="rounded-md bg-red-600 px-2 py-1 text-xs font-black text-white">Set đang thuê</button>
                     <button onClick={() => patch(account.id, "set-available")} className="rounded-md bg-green-600 px-2 py-1 text-xs font-black text-white">Sẵn sàng</button>
                     <button onClick={() => patch(account.id, "set-maintenance")} className="rounded-md bg-orange-500 p-2 text-white" title="Bảo trì"><Wrench className="h-4 w-4" /></button>
                     {account.status === "hidden" ? (
@@ -155,6 +175,51 @@ export function AdminAccountsTable({ accounts }: { accounts: AdminAccount[] }) {
           </tbody>
         </table>
       </div>
+      {rentingAccount && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4">
+          <form action={submitManualRent} className="w-full max-w-lg rounded-2xl border border-[#f3d6e6] bg-white p-5 shadow-[0_24px_70px_rgba(15,23,42,0.24)]">
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-black text-[#111827]">Set đang thuê</h2>
+                <p className="mt-1 text-sm font-semibold text-slate-500">{rentingAccount.name}</p>
+              </div>
+              <button type="button" onClick={() => setRentingAccount(null)} className="rounded-md border border-[#f3d6e6] p-2 text-[#ec3f96]">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <Field name="customerName" label="Tên khách" placeholder="Optional" />
+              <Field name="phone" label="SĐT/Zalo khách" placeholder="Optional" />
+              <Field name="contact" label="Liên hệ" placeholder="Zalo/Facebook" />
+              <label className="text-sm font-bold text-slate-700">
+                Gói thuê
+                <select name="packageType" defaultValue="hourly" className="mt-1 w-full rounded-md border border-[#f3d6e6] px-3 py-2 outline-none focus:border-[#ec3f96]">
+                  <option value="hourly">Theo giờ</option>
+                  <option value="night">Qua đêm</option>
+                  <option value="daily">Theo ngày</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <Field name="endTime" label="Thời gian kết thúc" type="datetime-local" required />
+              <Field name="adminNote" label="Ghi chú nội bộ" placeholder="Optional" />
+            </div>
+            {manualMessage && <p className="mt-3 text-sm font-bold text-red-600">{manualMessage}</p>}
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" onClick={() => setRentingAccount(null)} className="rounded-md border border-[#f3d6e6] px-4 py-2 text-sm font-black text-[#ec3f96]">Hủy</button>
+              <button className="rounded-md bg-red-600 px-4 py-2 text-sm font-black text-white">Lưu đang thuê</button>
+            </div>
+          </form>
+        </div>
+      )}
     </section>
+  );
+}
+
+function Field({ label, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
+  return (
+    <label className="text-sm font-bold text-slate-700">
+      {label}
+      <input {...props} className="mt-1 w-full rounded-md border border-[#f3d6e6] px-3 py-2 outline-none focus:border-[#ec3f96]" />
+    </label>
   );
 }

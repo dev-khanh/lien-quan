@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { AccountCard } from "@/components/AccountCard";
+import { FeaturedAccountSlider } from "@/components/FeaturedAccountSlider";
 
 export type PublicAccount = {
   id: string;
@@ -15,6 +16,10 @@ export type PublicAccount = {
   priceHourly: number;
   priceNight: number;
   priceDaily: number;
+  skinCount: number;
+  isFeatured?: boolean;
+  featuredImageUrl?: string | null;
+  featuredOrder?: number | null;
   status: "available" | "renting" | "maintenance" | "hidden";
   currentRentEndsAt: string | null;
 };
@@ -52,7 +57,7 @@ export function PublicAccountBrowser({ accounts }: { accounts: PublicAccount[] }
 
   return (
     <>
-      <section className="mb-6 rounded-[22px] border border-[#fbd0e3] bg-white/[0.90] p-4 shadow-[0_14px_38px_rgba(236,63,150,0.16)] backdrop-blur-md">
+      <section className="mb-6 rounded-[28px] border border-white/[0.18] bg-white/[0.08] p-4 shadow-[0_18px_48px_rgba(13,7,35,0.22)] backdrop-blur-[8px] sm:p-6">
         <label className="relative mb-4 block">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ec3f96]" />
           <input
@@ -79,9 +84,13 @@ export function PublicAccountBrowser({ accounts }: { accounts: PublicAccount[] }
         </div>
       </section>
 
+      <FeaturedAccountSlider accounts={accounts} />
+
       {visibleAccounts.length ? (
-        <section className="grid grid-cols-1 gap-6 min-[560px]:grid-cols-2 lg:grid-cols-3">
-          {visibleAccounts.map((account, index) => <AccountCard key={account.id} account={account} priority={index < 3} />)}
+        <section className="rounded-[28px] border border-white/[0.18] bg-white/[0.08] p-4 shadow-[0_18px_48px_rgba(13,7,35,0.22)] backdrop-blur-[8px] sm:p-6">
+          <div className="grid grid-cols-1 gap-6 min-[560px]:grid-cols-2 lg:grid-cols-3">
+            {visibleAccounts.map((account, index) => <AccountCard key={account.id} account={account} priority={index < 3} />)}
+          </div>
         </section>
       ) : (
         <section className="rounded-[20px] border border-[#f3d6e6] bg-white p-8 text-center font-black text-[#ec3f96]">

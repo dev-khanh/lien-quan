@@ -17,6 +17,9 @@ export const accountSchema = z.object({
   priceNight: z.coerce.number().int().min(1000),
   priceDaily: z.coerce.number().int().min(1000),
   thumbnailUrl: z.string().min(1),
+  isFeatured: z.coerce.boolean().optional(),
+  featuredImageUrl: z.string().url().or(z.string().startsWith("/")).optional().nullable(),
+  featuredOrder: z.coerce.number().int().min(0).optional().nullable(),
   status: z.enum(["available", "renting", "maintenance", "hidden"]).optional(),
   isVisible: z.coerce.boolean().optional(),
   images: z.array(z.string().url().or(z.string().startsWith("/"))).optional(),
@@ -40,4 +43,14 @@ export const reviewSchema = z.object({
   customerName: z.string().min(2).max(80),
   rating: z.coerce.number().int().min(1).max(5),
   comment: z.string().min(5).max(500)
+});
+
+export const shopSettingsSchema = z.object({
+  shopName: z.string().min(2).max(120),
+  zaloPhone: z.string().max(30).optional().nullable(),
+  zaloUrl: z.string().url().optional().or(z.literal("")).nullable(),
+  facebookUrl: z.string().url().optional().or(z.literal("")).nullable(),
+  rentalGuide: z.string().max(2000).optional().nullable(),
+  bankInfo: z.string().max(2000).optional().nullable(),
+  paymentQrUrl: z.string().url().or(z.string().startsWith("/")).optional().or(z.literal("")).nullable()
 });

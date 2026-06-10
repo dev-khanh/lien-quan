@@ -16,6 +16,7 @@ type AccountCardProps = {
     priceHourly: number;
     priceNight: number;
     priceDaily: number;
+    skinCount: number;
     status: "available" | "renting" | "maintenance" | "hidden";
     currentRentEndsAt: string | null;
   };
@@ -25,14 +26,16 @@ type AccountCardProps = {
 export function AccountCard({ account, priority = false }: AccountCardProps) {
   const renting = account.status === "renting";
   const maintenance = account.status === "maintenance";
+  const available = account.status === "available";
   const vipText = account.vipLevel.toUpperCase().startsWith("VIP") ? account.vipLevel.toUpperCase() : `VIP ${account.vipLevel}`;
+  const imageAlt = `Ảnh skin ${account.name} Liên Quân ${account.skinCount} skin ${account.sssCount} SSS`;
   return (
-    <article className={`overflow-hidden rounded-[22px] border bg-white shadow-[0_18px_46px_rgba(236,63,150,0.20)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_24px_58px_rgba(236,63,150,0.28)] ${renting || maintenance ? "border-white/40" : "border-[#ff5aa8]"}`}>
+    <article className={`overflow-hidden rounded-[22px] border bg-white shadow-[0_18px_42px_rgba(26,10,40,0.16)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_24px_58px_rgba(236,63,150,0.24)] ${renting || maintenance ? "border-[#f6d7e6]" : "border-[#ffc3dc]"}`}>
       <Link href={`/accounts/${account.slug}`} className="block">
         <div className="relative aspect-[1.48/1] overflow-hidden bg-[#fff5fb]">
           <Image
             src={account.thumbnailUrl}
-            alt={account.name}
+            alt={imageAlt}
             fill
             unoptimized={account.thumbnailUrl.startsWith("/")}
             priority={priority}
@@ -47,6 +50,11 @@ export function AccountCard({ account, priority = false }: AccountCardProps) {
           {maintenance && (
             <span className="absolute right-3 top-3 rounded-full bg-orange-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-wide text-white shadow-md">
               BẢO TRÌ
+            </span>
+          )}
+          {available && (
+            <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-wide text-white shadow-[0_10px_22px_rgba(16,185,129,0.28)]">
+              Sẵn sàng
             </span>
           )}
         </div>

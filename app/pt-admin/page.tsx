@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getAdminFromCookies } from "@/lib/auth";
+import { expireRentals } from "@/lib/expire-rentals";
 import { money } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { AlertTriangle, CheckCircle2, EyeOff, MessageSquare, Package, Timer, WalletCards, type LucideIcon } from "lucide-react";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   const admin = getAdminFromCookies();
   if (!admin) redirect("/pt-admin/login");
+  await expireRentals();
   const now = new Date();
   const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);

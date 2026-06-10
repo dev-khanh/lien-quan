@@ -2,12 +2,14 @@ import { redirect } from "next/navigation";
 import { AdminAccountsTable } from "@/components/AdminAccountsTable";
 import { AdminNav } from "@/components/AdminNav";
 import { getAdminFromCookies } from "@/lib/auth";
+import { expireRentals } from "@/lib/expire-rentals";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminAccountsPage() {
   if (!getAdminFromCookies()) redirect("/pt-admin/login");
+  await expireRentals();
   const accounts = await prisma.account.findMany({ orderBy: { createdAt: "desc" } });
   const rows = accounts.map((account) => ({
     id: account.id,

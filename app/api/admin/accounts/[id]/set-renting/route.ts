@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
+import { expireRentals } from "@/lib/expire-rentals";
 import { prisma } from "@/lib/prisma";
 
-const packageHours = { hourly: 1, night: 8, daily: 24 };
+const packageHours = { hourly: 1, night: 8, daily: 24, custom: 1 };
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   const { error } = await requireAdmin(request);
   if (error) return error;
+  await expireRentals();
   const body = await request.json();
-  const packageType = ["hourly", "night", "daily"].includes(body.packageType) ? body.packageType as "hourly" | "night" | "daily" : "hourly";
+  const rawPackageType = ["hourly", "night", "daily", "custom"].includes(body.packageType) ? body.packageType as keyof typeof packageHours : "hourly";
+  const packageType = rawPackageType === "custom" ? "hourly" : rawPackageType;
   const endTime = body.endTime ? new Date(body.endTime) : new Date(Date.now() + packageHours[packageType] * 60 * 60 * 1000);
   if (Number.isNaN(endTime.getTime()) || endTime <= new Date()) return NextResponse.json({ error: "Thời gian kết thúc không hợp lệ." }, { status: 400 });
   const account = await prisma.account.findUnique({ where: { id: params.id } });

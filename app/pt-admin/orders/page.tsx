@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { OrderActions } from "@/components/AdminActions";
 import { AdminNav } from "@/components/AdminNav";
 import { getAdminFromCookies } from "@/lib/auth";
+import { expireRentals } from "@/lib/expire-rentals";
 import { money } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
   if (!getAdminFromCookies()) redirect("/pt-admin/login");
+  await expireRentals();
   const orders = await prisma.rentOrder.findMany({ include: { account: true }, orderBy: { createdAt: "desc" } });
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">

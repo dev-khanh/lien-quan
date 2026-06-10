@@ -1,4 +1,4 @@
-import { expireRentals } from "./expire-rentals-core";
+import { expireRentals } from "@/lib/expire-rentals";
 
 expireRentals()
   .then((result) => {

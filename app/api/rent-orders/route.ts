@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { expireRentals } from "@/lib/expire-rentals";
 import { prisma } from "@/lib/prisma";
 import { rentalHours } from "@/lib/format";
 import { saveUpload } from "@/lib/upload";
@@ -6,6 +7,7 @@ import { rentOrderSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
   try {
+    await expireRentals();
     const form = await request.formData();
     const parsed = rentOrderSchema.parse({
       accountId: form.get("accountId"),

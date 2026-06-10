@@ -33,7 +33,7 @@ textarea {
   background-image: url("/backgrounds/lien-quan-hero-bg.png");
   background-size: cover;
   background-position: center top;
-  filter: saturate(1.08) contrast(1.04);
+  filter: saturate(0.95) contrast(1.02) brightness(0.82) blur(1.4px);
   transform: scale(1.04);
   animation: public-bg-drift 18s ease-in-out infinite alternate;
   will-change: transform, filter;
@@ -43,8 +43,9 @@ textarea {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 18%, rgba(255, 47, 159, 0.18), transparent 34%),
-    linear-gradient(180deg, rgba(15, 5, 27, 0.08) 0%, rgba(15, 5, 27, 0.18) 42%, rgba(15, 5, 27, 0.36) 100%);
+    linear-gradient(rgba(7, 4, 18, 0.34), rgba(7, 4, 18, 0.40)),
+    radial-gradient(circle at 50% 18%, rgba(255, 47, 159, 0.10), transparent 34%),
+    linear-gradient(180deg, rgba(15, 5, 27, 0.12) 0%, rgba(15, 5, 27, 0.26) 42%, rgba(15, 5, 27, 0.44) 100%);
   backdrop-filter: blur(0.3px);
 }
 
@@ -71,11 +72,11 @@ textarea {
 @keyframes public-bg-drift {
   from {
     transform: scale(1.04) translate3d(-1.2%, -0.8%, 0);
-    filter: saturate(1.05) contrast(1.02) brightness(0.98);
+    filter: saturate(0.92) contrast(1.02) brightness(0.78) blur(1.2px);
   }
   to {
     transform: scale(1.09) translate3d(1.2%, 1%, 0);
-    filter: saturate(1.16) contrast(1.08) brightness(1.05);
+    filter: saturate(1.02) contrast(1.06) brightness(0.86) blur(1.8px);
   }
 }
 

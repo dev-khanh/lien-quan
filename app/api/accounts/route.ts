@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { expireRentals } from "@/lib/expire-rentals";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  await expireRentals();
   const accounts = await prisma.account.findMany({
     where: { isVisible: true, status: { not: "hidden" } },
     select: {

@@ -55,6 +55,9 @@ model Account {
   priceDaily        Int                @map("price_daily")
   status            AccountStatus      @default(available)
   thumbnailUrl      String             @map("thumbnail_url")
+  isFeatured        Boolean            @default(false) @map("is_featured")
+  featuredImageUrl  String?            @map("featured_image_url")
+  featuredOrder     Int?               @map("featured_order")
   gameUsernameEnc   String?            @map("game_username_enc") @db.Text
   gamePasswordEnc   String?            @map("game_password_enc") @db.Text
   loginNote         String?            @map("login_note") @db.Text
@@ -147,4 +150,19 @@ model AccountUpdateLog {
   account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("account_update_logs")
+}
+
+model ShopSettings {
+  id            String   @id @default("default")
+  shopName      String   @default("Shop thuê ACC Liên Quân") @map("shop_name")
+  zaloPhone     String?  @map("zalo_phone")
+  zaloUrl       String?  @map("zalo_url")
+  facebookUrl   String?  @map("facebook_url")
+  rentalGuide   String?  @map("rental_guide") @db.Text
+  bankInfo      String?  @map("bank_info") @db.Text
+  paymentQrUrl  String?  @map("payment_qr_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("shop_settings")
 }
