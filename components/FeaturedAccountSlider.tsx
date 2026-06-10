@@ -118,7 +118,7 @@ export function FeaturedAccountSlider({ accounts }: { accounts: PublicAccount[] 
                 <h3 className="mt-1 max-w-[390px] text-[22px] font-black uppercase leading-tight tracking-normal sm:text-[28px]">
                   {account.name} - {account.sssCount} Skin SSS
                 </h3>
-                <p className="mt-2 text-[13px] font-bold text-white/76 sm:text-sm">
+                <p className="mt-2 text-[13px] font-bold text-white/[0.76] sm:text-sm">
                   {account.skinCount} skin • {account.vipLevel} • Hợp tác {account.collaborationCount}
                 </p>
                 <p className="mt-2 text-xl font-black text-white sm:mt-4 sm:text-2xl">Từ {money(lowestPrice)} / giờ</p>

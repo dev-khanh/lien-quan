@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { AccountCard } from "@/components/AccountCard";
 import { FeaturedAccountSlider } from "@/components/FeaturedAccountSlider";
+import { FeaturedHeroesSection } from "@/components/FeaturedHeroesSection";
 
 export type PublicAccount = {
   id: string;
@@ -85,6 +86,8 @@ export function PublicAccountBrowser({ accounts }: { accounts: PublicAccount[] }
       </section>
 
       <FeaturedAccountSlider accounts={accounts} />
+
+      <FeaturedHeroesSection />
 
       {visibleAccounts.length ? (
         <section className="rounded-[28px] border border-white/[0.18] bg-white/[0.08] p-4 shadow-[0_18px_48px_rgba(13,7,35,0.22)] backdrop-blur-[8px] sm:p-6">
