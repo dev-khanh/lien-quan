@@ -6,6 +6,7 @@ import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewList } from "@/components/ReviewList";
 import { ZaloRentCard } from "@/components/ZaloRentCard";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import AccountImageGallery from "@/components/AccountImageGallery";
 import { expireRentals } from "@/lib/expire-rentals";
 import { money } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -91,16 +92,7 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
               </div>
             </div>
           </div>
-          <section>
-            <h2 className="mb-3 text-xl font-black text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]">Hình ảnh skin ACC</h2>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {account.images.map((image) => (
-              <div key={image.id} className="relative aspect-video overflow-hidden rounded-[20px] border border-[#f3d6e6] bg-white shadow-[0_12px_32px_rgba(236,63,150,0.10)]">
-                <Image src={image.url} alt={image.alt || imageAlt} fill unoptimized={image.url.startsWith("/")} className="object-cover" />
-              </div>
-              ))}
-            </div>
-          </section>
+          <AccountImageGallery thumbnailUrl={account.thumbnailUrl} images={account.images} imageAlt={imageAlt} />
           <section>
             <h2 className="mb-3 text-xl font-black text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]">Đánh giá khách thuê ACC</h2>
             <ReviewList reviews={account.reviews} />
