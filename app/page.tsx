@@ -1,18 +1,19 @@
 import { PublicAccountBrowser } from "@/components/PublicAccountBrowser";
 import { Crown } from "lucide-react";
 import { expireRentals } from "@/lib/expire-rentals";
+import { hasDatabaseUrl } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   await expireRentals();
-  const accounts = await prisma.account.findMany({
-    where: { isVisible: true, status: { not: "hidden" } },
-    include: { reviews: { where: { status: "approved" }, take: 2, orderBy: { createdAt: "desc" } } },
-    orderBy: [{ status: "asc" }, { createdAt: "desc" }]
-  });
-  const reviews = accounts.flatMap((account) => account.reviews.map((review) => ({ ...review, accountName: account.name }))).slice(0, 6);
+  const accounts = hasDatabaseUrl()
+    ? await prisma.account.findMany({
+        where: { isVisible: true, status: { not: "hidden" } },
+        orderBy: [{ status: "asc" }, { createdAt: "desc" }]
+      })
+    : [];
   const publicAccounts = accounts.map((account) => ({
     id: account.id,
     slug: account.slug,
@@ -31,8 +32,26 @@ export default async function HomePage() {
     status: account.status,
     currentRentEndsAt: account.currentRentEndsAt?.toISOString() || null
   }));
+  const faqs = [
+    ["Thuê ACC Liên Quân là gì?", "Thuê ACC Liên Quân là dịch vụ cho người chơi mượn tài khoản đã có sẵn tướng, skin, rank hoặc skin SSS trong một khoảng thời gian nhất định để trải nghiệm nhanh mà không cần tự cày từ đầu."],
+    ["Thuê ACC Liên Quân có an toàn không?", "Shop chỉ bàn giao thông tin sau khi xác nhận đơn thuê và luôn ưu tiên tài khoản đang sẵn sàng. Người thuê cần dùng đúng thời gian đã thống nhất và không thay đổi thông tin đăng nhập."],
+    ["Có thuê theo giờ không?", "Có. Người chơi có thể thuê ACC Liên Quân theo giờ nếu chỉ cần test skin, leo rank ngắn hoặc chơi cùng bạn bè trong thời gian ngắn."],
+    ["Có thuê qua đêm không?", "Có. Gói thuê ACC Liên Quân qua đêm phù hợp khi cần chơi lâu hơn, tiết kiệm hơn so với thuê nhiều giờ lẻ."],
+    ["ACC đang thuê thì làm sao?", "Nếu ACC đang thuê, bạn có thể chờ đồng hồ đếm ngược kết thúc hoặc chọn ACC khác đang sẵn sàng trong danh sách."],
+    ["Làm sao biết ACC có nhiều skin SSS?", "Mỗi thẻ ACC hiển thị tổng skin, số skin SSS, skin hợp tác và ảnh preview để bạn kiểm tra trước khi liên hệ thuê qua Zalo."]
+  ];
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(([question, answer]) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: { "@type": "Answer", text: answer }
+    }))
+  };
   return (
     <main className="mx-auto max-w-[1360px] px-4 pb-24 pt-5 text-[#111827] sm:px-6 lg:py-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <header className="relative mb-5 overflow-hidden rounded-[24px] border border-[#fbd0e3] bg-white/[0.92] px-5 py-6 shadow-[0_18px_54px_rgba(236,63,150,0.18)] backdrop-blur-md sm:px-8 lg:px-12">
         <div className="pointer-events-none absolute right-10 top-7 text-4xl font-black text-[#ffd6e8]">✦</div>
         <div className="pointer-events-none absolute right-28 bottom-8 text-2xl font-black text-[#ffe3ef]">✦</div>
@@ -54,23 +73,24 @@ export default async function HomePage() {
       <PublicAccountBrowser accounts={publicAccounts} />
 
       <section className="mt-8 rounded-[24px] border border-[#fbd0e3] bg-white/[0.90] p-5 text-[#111827] shadow-[0_16px_40px_rgba(236,63,150,0.16)] backdrop-blur-md">
-        <div className="mb-4 flex items-end justify-between gap-3">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#ec3f96]">Đánh giá khách hàng</p>
-            <h2 className="text-xl font-black">Đánh giá khách thuê ACC</h2>
-          </div>
+        <h2 className="text-2xl font-black text-[#111827]">Thuê ACC Liên Quân nhiều skin SSS, giá rẻ, nhận acc nhanh qua Zalo</h2>
+        <div className="mt-4 space-y-4 text-sm font-semibold leading-7 text-slate-700 sm:text-base">
+          <p>Shop tập trung vào nhu cầu thuê ACC Liên Quân nhanh, rõ thông tin và dễ chọn tài khoản trước khi liên hệ. Mỗi ACC được hiển thị ảnh skin, tổng số skin, số skin SSS, skin hợp tác, rank, giá thuê theo từng gói và trạng thái hiện tại. Nhờ vậy người chơi có thể xem trước tài khoản phù hợp để trải nghiệm skin đẹp, leo rank cùng bạn bè hoặc test các bộ trang phục hiếm mà không mất thời gian cày lại từ đầu.</p>
+          <p>Dịch vụ thuê ACC Liên Quân nhiều skin phù hợp với người muốn chơi ngắn hạn nhưng vẫn cần tài khoản chất lượng. Bạn có thể chọn thuê ACC Liên Quân SSS nếu ưu tiên các skin nổi bật, hiệu ứng đẹp và tài khoản có nhiều bộ sưu tập giá trị. Những ACC đang sẵn sàng sẽ có nút liên hệ Zalo để shop kiểm tra và xác nhận nhanh, hạn chế việc khách chọn nhầm tài khoản đang được người khác thuê.</p>
+          <p>Shop hỗ trợ thuê ACC Liên Quân theo giờ cho nhu cầu chơi nhanh, test skin hoặc leo vài trận trong ngày. Nếu muốn chơi lâu hơn, bạn có thể chọn thuê ACC Liên Quân qua đêm hoặc thuê theo ngày để có thời gian thoải mái hơn. Các gói được trình bày công khai trên từng trang ACC để khách dễ so sánh trước khi nhắn Zalo.</p>
+          <p>Với tiêu chí thuê ACC Liên Quân giá rẻ nhưng vẫn rõ ràng và tiện thao tác, website luôn ưu tiên danh sách tài khoản visible, trạng thái sẵn sàng và thông tin dễ đọc trên cả điện thoại lẫn máy tính. Khi cần thuê, bạn chỉ cần mở ACC muốn dùng, copy nội dung nhắn hoặc bấm Thuê qua Zalo để shop kiểm tra tình trạng và hướng dẫn nhận acc.</p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {reviews.map((review) => (
-            <article key={review.id} className="rounded-[18px] border border-[#f3d6e6] bg-white p-4">
-              <div className="flex items-center justify-between gap-3">
-                <strong>{review.customerName}</strong>
-                <span className="text-sm font-black text-[#ec3f96]">{review.accountName}</span>
-              </div>
-              <p className="mt-2 text-sm font-medium text-slate-600">{review.comment}</p>
+      </section>
+
+      <section className="mt-8 rounded-[24px] border border-[#fbd0e3] bg-white/[0.90] p-5 text-[#111827] shadow-[0_16px_40px_rgba(236,63,150,0.16)] backdrop-blur-md">
+        <h2 className="text-2xl font-black text-[#111827]">Câu hỏi thường gặp</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {faqs.map(([question, answer]) => (
+            <article key={question} className="rounded-[18px] border border-[#f3d6e6] bg-white p-4">
+              <h3 className="font-black text-[#111827]">{question}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{answer}</p>
             </article>
           ))}
-          {!reviews.length && <p className="text-sm font-bold text-slate-600">Chưa có đánh giá được duyệt.</p>}
         </div>
       </section>
 

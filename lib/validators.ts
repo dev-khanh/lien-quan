@@ -54,3 +54,15 @@ export const shopSettingsSchema = z.object({
   bankInfo: z.string().max(2000).optional().nullable(),
   paymentQrUrl: z.string().url().or(z.string().startsWith("/")).optional().or(z.literal("")).nullable()
 });
+
+export const postSchema = z.object({
+  title: z.string().min(3).max(180),
+  slug: z.string().min(2).max(180).regex(/^[a-z0-9-]+$/),
+  excerpt: z.string().max(500).optional().nullable(),
+  content: z.string().min(10),
+  coverImageUrl: z.string().url().or(z.string().startsWith("/")).optional().or(z.literal("")).nullable(),
+  category: z.string().max(80).optional().nullable(),
+  metaTitle: z.string().max(180).optional().nullable(),
+  metaDescription: z.string().max(300).optional().nullable(),
+  published: z.coerce.boolean().optional()
+});

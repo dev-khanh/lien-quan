@@ -10,22 +10,24 @@ import { expireRentals } from "@/lib/expire-rentals";
 import { money } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { getShopSettings, getZaloHref } from "@/lib/settings";
+import { hasDatabaseUrl } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
 function accountImageAlt(account: { name: string; skinCount: number; sssCount: number }) {
-  return `Ảnh skin ${account.name} Liên Quân ${account.skinCount} skin ${account.sssCount} SSS`;
+  return `Ảnh ${account.name} Liên Quân ${account.skinCount} skin ${account.sssCount} SSS`;
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  if (!hasDatabaseUrl()) return {};
   const account = await prisma.account.findFirst({
     where: { OR: [{ id: params.id }, { slug: params.id }], isVisible: true, status: { not: "hidden" } },
-    select: { name: true, slug: true, skinCount: true, sssCount: true, rank: true, thumbnailUrl: true }
+    select: { name: true, slug: true, skinCount: true, sssCount: true, collaborationCount: true, rank: true, thumbnailUrl: true }
   });
   if (!account) return {};
-  const title = `Thuê ${account.name} Liên Quân ${account.skinCount} Skin, ${account.sssCount} SSS | Shop thuê acc giá rẻ`;
-  const description = `Thuê ${account.name} Liên Quân nhiều skin đẹp, ${account.skinCount} skin, ${account.sssCount} skin SSS, rank ${account.rank}. Cho thuê theo giờ, đêm, ngày. Xác nhận nhanh qua Zalo.`;
-  const url = `/accounts/${account.slug}`;
+  const title = `Thuê ${account.name} Liên Quân ${account.skinCount} skin, ${account.sssCount} SSS giá rẻ`;
+  const description = `Thuê ${account.name} Liên Quân ${account.skinCount} skin, ${account.sssCount} skin SSS, ${account.collaborationCount} skin hợp tác, rank ${account.rank}. Cho thuê theo giờ, qua đêm, theo ngày. Liên hệ Zalo để thuê nhanh.`;
+  const url = `/acc/${account.slug}`;
   return {
     title,
     description,
@@ -44,10 +46,12 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
 export default async function AccountDetailPage({ params }: { params: { id: string } }) {
   await expireRentals();
-  const account = await prisma.account.findFirst({
-    where: { OR: [{ id: params.id }, { slug: params.id }], isVisible: true, status: { not: "hidden" } },
-    include: { images: { orderBy: { sortOrder: "asc" } }, reviews: { where: { status: "approved" }, include: { images: { orderBy: { sortOrder: "asc" } } }, orderBy: { createdAt: "desc" } } }
-  });
+  const account = hasDatabaseUrl()
+    ? await prisma.account.findFirst({
+        where: { OR: [{ id: params.id }, { slug: params.id }], isVisible: true, status: { not: "hidden" } },
+        include: { images: { orderBy: { sortOrder: "asc" } }, reviews: { where: { status: "approved" }, include: { images: { orderBy: { sortOrder: "asc" } } }, orderBy: { createdAt: "desc" } } }
+      })
+    : null;
   if (!account) notFound();
   const settings = await getShopSettings();
   const stats: Array<[string, string | number, LucideIcon]> = [

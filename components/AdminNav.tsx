@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { BarChart3, LogOut, MessageSquare, Package, Settings, ShoppingCart } from "lucide-react";
+import { BarChart3, FileText, LogOut, MessageSquare, Package, Settings, ShoppingCart } from "lucide-react";
 
 const links = [
   { href: "/pt-admin/dashboard", label: "Dashboard", icon: BarChart3 },
   { href: "/pt-admin/accounts", label: "Quản lý ACC", icon: Package },
   { href: "/pt-admin/orders", label: "Đơn thuê", icon: ShoppingCart },
   { href: "/pt-admin/reviews", label: "Đánh giá", icon: MessageSquare },
+  { href: "/pt-admin/posts", label: "Tin tức", icon: FileText },
   { href: "/pt-admin/settings", label: "Cài đặt", icon: Settings }
 ];
 
