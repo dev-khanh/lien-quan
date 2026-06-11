@@ -25,10 +25,10 @@ const MAX_SCALE = 5;
 
 export default function AccountImageGallery({ thumbnailUrl, images, imageAlt }: AccountImageGalleryProps) {
   const galleryImages = useMemo<GalleryImage[]>(
-    () => [
+    () => Array.from(new Map([
       { url: thumbnailUrl, alt: imageAlt, key: "thumbnail" },
       ...images.map((image) => ({ url: image.url, alt: image.alt || imageAlt, key: image.id }))
-    ],
+    ].map((image) => [image.url, image])).values()),
     [thumbnailUrl, images, imageAlt]
   );
 
@@ -63,8 +63,8 @@ export default function AccountImageGallery({ thumbnailUrl, images, imageAlt }: 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!isOpen) return;
     if (event.key === "Escape") closeLightbox();
-    if (event.key === "ArrowRight") nextImage();
-    if (event.key === "ArrowLeft") prevImage();
+    if (galleryImages.length > 1 && event.key === "ArrowRight") nextImage();
+    if (galleryImages.length > 1 && event.key === "ArrowLeft") prevImage();
   };
 
   useEffect(() => {
@@ -91,8 +91,8 @@ export default function AccountImageGallery({ thumbnailUrl, images, imageAlt }: 
     if (touchStartX.current === null) return;
     const touchEndX = event.changedTouches[0]?.clientX ?? 0;
     const deltaX = touchStartX.current - touchEndX;
-    if (deltaX > SWIPE_THRESHOLD) nextImage();
-    else if (deltaX < -SWIPE_THRESHOLD) prevImage();
+    if (galleryImages.length > 1 && deltaX > SWIPE_THRESHOLD) nextImage();
+    else if (galleryImages.length > 1 && deltaX < -SWIPE_THRESHOLD) prevImage();
     touchStartX.current = null;
   };
 
@@ -123,11 +123,11 @@ export default function AccountImageGallery({ thumbnailUrl, images, imageAlt }: 
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {galleryImages.map((image, index) => (
+          {galleryImages.slice(1).map((image, index) => (
             <button
               key={image.key}
               type="button"
-              onClick={() => openLightbox(index)}
+              onClick={() => openLightbox(index + 1)}
               className="relative aspect-video overflow-hidden rounded-[20px] border border-transparent bg-white shadow-[0_12px_32px_rgba(236,63,150,0.10)] transition hover:border-pink-500 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-500"
             >
               <Image src={image.url} alt={image.alt} fill unoptimized={image.url.startsWith("/")} className="object-cover" />
@@ -219,13 +219,17 @@ export default function AccountImageGallery({ thumbnailUrl, images, imageAlt }: 
             )}
           </TransformWrapper>
 
-          <button type="button" onClick={prevImage} className="hidden items-center justify-center rounded-full bg-white/10 p-3 text-white transition hover:bg-white/20 sm:flex sm:absolute sm:left-4 sm:top-1/2 sm:-translate-y-1/2" aria-label="Ảnh trước">
-            <ChevronLeft className="h-6 w-6" />
-          </button>
+          {galleryImages.length > 1 && (
+            <button type="button" onClick={prevImage} className="hidden items-center justify-center rounded-full bg-white/10 p-3 text-white transition hover:bg-white/20 sm:flex sm:absolute sm:left-4 sm:top-1/2 sm:-translate-y-1/2" aria-label="Ảnh trước">
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+          )}
 
-          <button type="button" onClick={nextImage} className="hidden items-center justify-center rounded-full bg-white/10 p-3 text-white transition hover:bg-white/20 sm:flex sm:absolute sm:right-4 sm:top-1/2 sm:-translate-y-1/2" aria-label="Ảnh tiếp theo">
-            <ChevronRight className="h-6 w-6" />
-          </button>
+          {galleryImages.length > 1 && (
+            <button type="button" onClick={nextImage} className="hidden items-center justify-center rounded-full bg-white/10 p-3 text-white transition hover:bg-white/20 sm:flex sm:absolute sm:right-4 sm:top-1/2 sm:-translate-y-1/2" aria-label="Ảnh tiếp theo">
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          )}
         </div>
       )}
     </section>

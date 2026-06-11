@@ -120,8 +120,20 @@ model Review {
   updatedAt    DateTime     @updatedAt @map("updated_at")
   account      Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
   order        RentOrder?   @relation(fields: [orderId], references: [id])
+  images       ReviewImage[]
 
   @@map("reviews")
+}
+
+model ReviewImage {
+  id        String   @id @default(cuid())
+  reviewId  String   @map("review_id")
+  url       String
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@map("review_images")
 }
 
 model Admin {

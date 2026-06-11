@@ -3,15 +3,13 @@
 import { MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-export function FloatingZaloButton() {
+export function FloatingZaloButton({ zaloHref }: { zaloHref: string }) {
   const pathname = usePathname();
   if (pathname.startsWith("/pt-admin")) return null;
 
-  const zaloUrl = process.env.NEXT_PUBLIC_ZALO_URL || "https://zalo.me";
-
   return (
     <a
-      href={zaloUrl}
+      href={zaloHref}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Kết bạn Zalo"

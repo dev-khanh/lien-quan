@@ -1,12 +1,11 @@
-import Image from "next/image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CheckCircle2, Crown, Percent, ShieldCheck, Sparkles, Star, type LucideIcon } from "lucide-react";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewList } from "@/components/ReviewList";
 import { ZaloRentCard } from "@/components/ZaloRentCard";
-import { CountdownTimer } from "@/components/CountdownTimer";
 import AccountImageGallery from "@/components/AccountImageGallery";
+import { AccountHeroImage } from "@/components/AccountHeroImage";
 import { expireRentals } from "@/lib/expire-rentals";
 import { money } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -47,7 +46,7 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
   await expireRentals();
   const account = await prisma.account.findFirst({
     where: { OR: [{ id: params.id }, { slug: params.id }], isVisible: true, status: { not: "hidden" } },
-    include: { images: { orderBy: { sortOrder: "asc" } }, reviews: { where: { status: "approved" }, orderBy: { createdAt: "desc" } } }
+    include: { images: { orderBy: { sortOrder: "asc" } }, reviews: { where: { status: "approved" }, include: { images: { orderBy: { sortOrder: "asc" } } }, orderBy: { createdAt: "desc" } } }
   });
   if (!account) notFound();
   const settings = await getShopSettings();
@@ -69,10 +68,13 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
       <div className="grid gap-5 lg:grid-cols-[1.35fr_0.65fr]">
         <section className="space-y-4">
           <div className="overflow-hidden rounded-[24px] border border-[#f3d6e6] bg-white shadow-[0_12px_32px_rgba(236,63,150,0.12)]">
-            <div className="relative aspect-video">
-              <Image src={account.thumbnailUrl} alt={imageAlt} fill unoptimized={account.thumbnailUrl.startsWith("/")} className="object-cover" priority />
-              {account.status === "renting" && <div className="absolute left-3 top-3"><CountdownTimer endAt={account.currentRentEndsAt} /></div>}
-            </div>
+            <AccountHeroImage
+              thumbnailUrl={account.thumbnailUrl}
+              images={account.images}
+              imageAlt={imageAlt}
+              status={account.status}
+              currentRentEndsAt={account.currentRentEndsAt?.toISOString() || null}
+            />
             <div className="p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="mr-auto text-2xl font-black text-[#111827]">{detailTitle}</h1>
@@ -111,6 +113,8 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
             account={{
               name: account.name,
               status: account.status,
+              skinCount: account.skinCount,
+              sssCount: account.sssCount,
               priceHourly: account.priceHourly,
               priceNight: account.priceNight,
               priceDaily: account.priceDaily,

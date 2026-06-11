@@ -130,6 +130,29 @@ export function AdminAccountForm({ account }: { account?: AccountFormValue }) {
     setDetailPreviews((current) => current.filter((_, itemIndex) => itemIndex !== index));
   }
 
+  function moveDetail(index: number, direction: -1 | 1) {
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= detailImages.length) return;
+    setDetailImages((current) => {
+      const next = [...current];
+      [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+      return next;
+    });
+    setDetailPreviews((current) => {
+      const next = [...current];
+      [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+      return next;
+    });
+  }
+
+  function setDetailAsThumbnail(index: number) {
+    const url = detailImages[index];
+    const preview = detailPreviews[index];
+    if (!url || !preview) return;
+    setThumbnailUrl(url);
+    setThumbnailPreview(preview);
+  }
+
   async function submit(formData: FormData) {
     setSaving(true);
     setMessage("");
@@ -256,7 +279,12 @@ export function AdminAccountForm({ account }: { account?: AccountFormValue }) {
             {detailPreviews.map((url, index) => (
               <div key={`${url}-${index}`} className="overflow-hidden rounded-lg border border-[#f3d6e6] bg-white">
                 <Image src={url} alt="Preview chi tiết" width={320} height={200} unoptimized className="h-28 w-full object-cover" />
-                <button type="button" onClick={() => removeDetail(index)} className="w-full bg-red-600 px-3 py-2 text-xs font-black text-white">Xóa ảnh</button>
+                <div className="grid grid-cols-2 gap-px bg-white">
+                  <button type="button" onClick={() => moveDetail(index, -1)} className="bg-slate-700 px-2 py-2 text-xs font-black text-white disabled:opacity-40" disabled={index === 0}>Lên</button>
+                  <button type="button" onClick={() => moveDetail(index, 1)} className="bg-slate-700 px-2 py-2 text-xs font-black text-white disabled:opacity-40" disabled={index === detailPreviews.length - 1}>Xuống</button>
+                  <button type="button" onClick={() => setDetailAsThumbnail(index)} className="bg-[#ec3f96] px-2 py-2 text-xs font-black text-white">Làm đại diện</button>
+                  <button type="button" onClick={() => removeDetail(index)} className="bg-red-600 px-2 py-2 text-xs font-black text-white">Xóa</button>
+                </div>
               </div>
             ))}
           </div>

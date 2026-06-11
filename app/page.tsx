@@ -77,6 +77,16 @@ export default async function HomePage() {
       <footer className="mt-8 rounded-[24px] border border-[#fbd0e3] bg-white/[0.88] p-5 text-center text-sm font-semibold text-slate-600 shadow-[0_12px_30px_rgba(236,63,150,0.12)] backdrop-blur-md">
         <p className="font-black text-[#111827]">Shop thuê ACC Liên Quân</p>
         <p className="mt-1">Liên hệ Zalo/Facebook: cập nhật trong cấu hình shop. Hỗ trợ thuê acc theo giờ, đêm, ngày.</p>
+        <div className="mx-auto mt-4 max-w-2xl rounded-2xl border border-[#f3d6e6] bg-white/80 p-4 text-left">
+          <p className="font-black text-[#111827]">Thêm web vào màn hình chính trên iPhone</p>
+          <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm font-semibold text-slate-600">
+            <li>Mở web bằng Safari.</li>
+            <li>Bấm nút Chia sẻ.</li>
+            <li>Chọn "Thêm vào Màn hình chính".</li>
+            <li>Bấm "Thêm".</li>
+          </ol>
+          <p className="mt-2 text-xs font-bold text-slate-500">iPhone cần Safari để thêm vào màn hình chính và mở như app.</p>
+        </div>
       </footer>
     </main>
   );

@@ -9,6 +9,8 @@ type ZaloRentCardProps = {
   account: {
     name: string;
     status: "available" | "renting" | "maintenance" | "hidden";
+    skinCount: number;
+    sssCount: number;
     priceHourly: number;
     priceNight: number;
     priceDaily: number;
@@ -29,7 +31,7 @@ export function ZaloRentCard({ account, zaloHref, rentalGuide }: ZaloRentCardPro
   const [message, setMessage] = useState("");
   const available = account.status === "available";
   const renting = account.status === "renting";
-  const copyText = `Em muốn thuê ${account.name}. Giá: ${money(account.priceHourly)}/giờ, ${money(account.priceNight)}/đêm, ${money(account.priceDaily)}/ngày. Shop kiểm tra giúp em acc còn trống không.`;
+  const copyText = `Em muốn thuê ${account.name} Liên Quân ${account.skinCount} skin, ${account.sssCount} skin SSS. Shop kiểm tra giúp em acc còn trống không.`;
 
   async function copyMessage() {
     await navigator.clipboard.writeText(copyText);
@@ -78,10 +80,14 @@ export function ZaloRentCard({ account, zaloHref, rentalGuide }: ZaloRentCardPro
         )}
         <button type="button" onClick={copyMessage} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-[#f3d6e6] bg-white px-4 text-sm font-black uppercase text-[#ec3f96]">
           <Copy className="h-4 w-4" />
-          Copy nội dung nhắn Zalo
+          Copy nội dung nhắn
         </button>
       </div>
-      {message && <p className="mt-3 rounded-xl bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">{message}</p>}
+      {message && (
+        <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+5rem)] left-1/2 z-[70] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-xl bg-emerald-600 px-4 py-3 text-center text-sm font-bold text-white shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
+          {message}
+        </div>
+      )}
     </section>
   );
 }

@@ -42,7 +42,7 @@ export const reviewSchema = z.object({
   orderId: z.string().optional().nullable(),
   customerName: z.string().min(2).max(80),
   rating: z.coerce.number().int().min(1).max(5),
-  comment: z.string().min(5).max(500)
+  comment: z.string().min(1).max(500)
 });
 
 export const shopSettingsSchema = z.object({
