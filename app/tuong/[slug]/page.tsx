@@ -6,6 +6,7 @@ import { HeroDetailClient } from "@/components/HeroDetailClient";
 import { getHeroBySlug, featuredHeroes } from "@/lib/heroes";
 import { prisma } from "@/lib/prisma";
 import { expireRentals } from "@/lib/expire-rentals";
+import { hasDatabaseUrl } from "@/lib/env";
 
 export async function generateStaticParams() {
   return featuredHeroes.map((hero) => ({ slug: hero.slug }));
@@ -31,11 +32,13 @@ export default async function HeroDetailPage({ params }: { params: { slug: strin
   const hero = getHeroBySlug(params.slug);
   if (!hero) notFound();
   await expireRentals();
-  const accounts = await prisma.account.findMany({
-    where: { isVisible: true, status: { not: "hidden" } },
-    orderBy: [{ sssCount: "desc" }, { createdAt: "desc" }],
-    take: 3
-  });
+  const accounts = hasDatabaseUrl()
+    ? await prisma.account.findMany({
+        where: { isVisible: true, status: { not: "hidden" } },
+        orderBy: [{ sssCount: "desc" }, { createdAt: "desc" }],
+        take: 3
+      })
+    : [];
   const publicAccounts = accounts.map((account) => ({
     id: account.id,
     slug: account.slug,

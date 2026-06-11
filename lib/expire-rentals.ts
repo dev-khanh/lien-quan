@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import { hasDatabaseUrl } from "@/lib/env";
 
 export async function expireRentals() {
+  if (!hasDatabaseUrl()) return { completedOrders: 0, releasedAccounts: 0 };
   const now = new Date();
   const expired = await prisma.rentOrder.findMany({
     where: { status: "renting", endTime: { lte: now } },

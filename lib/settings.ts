@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
+import { hasDatabaseUrl } from "@/lib/env";
 
-const defaultSettings = {
+export const defaultSettings = {
   id: "default",
   shopName: "Shop thuê ACC Liên Quân",
   zaloPhone: "",
@@ -12,6 +13,7 @@ const defaultSettings = {
 };
 
 export async function getShopSettings() {
+  if (!hasDatabaseUrl()) return defaultSettings;
   const settings = await prisma.shopSettings.upsert({
     where: { id: "default" },
     update: {},
