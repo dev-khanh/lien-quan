@@ -1,3 +1,4 @@
+import { getSiteUrl } from "@/lib/site-url";
 import type { Metadata, Viewport } from "next";
 import { AnimatedPublicBackground } from "@/components/AnimatedPublicBackground";
 import { FloatingZaloButton } from "@/components/FloatingZaloButton";
@@ -5,7 +6,7 @@ import { getShopSettings, getZaloHref } from "@/lib/settings";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  metadataBase: new URL(getSiteUrl()),
   title: "Shop thuê ACC Liên Quân nhiều skin SSS, giá rẻ",
   description: "Danh sách acc Liên Quân nhiều skin đẹp, thuê theo giờ, đêm, ngày. Thông tin đăng nhập chỉ mở sau khi admin xác nhận thanh toán.",
   alternates: { canonical: "/" },

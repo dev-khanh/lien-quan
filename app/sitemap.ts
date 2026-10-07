@@ -1,10 +1,11 @@
+import { getSiteUrl } from "@/lib/site-url";
 import type { MetadataRoute } from "next";
 import { hasDatabaseUrl } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { featuredHeroes } from "@/lib/heroes";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://thueacclienquan.com";
+  const baseUrl = getSiteUrl();
   const now = new Date();
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
